@@ -13,8 +13,8 @@
 #include <chrono>
 #include <iomanip>
 
-#define PORT 4321
-#define MAX_CLIENTS 10
+#define PORT 4444
+#define MAX_CLIENTS 20
 
 namespace fs = std::filesystem;
 
@@ -81,12 +81,13 @@ std::string handle_list() {
     bool has_files = false;
 
     for (const auto &entry : fs::directory_iterator(server_music_dir)) {
-        if (fs::is_regular_file(entry.path())) {
-            has_files = true;  // Mark that we found at least one file
-            std::string file_name = entry.path().filename().string();
-            std::string file_hash = compute_file_hash(entry.path().string());
-            file_list += file_name + "|" + file_hash + "\n";  // Send name|hash to client
+        if (!fs::is_regular_file(entry.path())) {
+            continue;
         }
+        has_files = true;  // Mark that we found at least one file
+        std::string file_name = entry.path().filename().string();
+        std::string file_hash = compute_file_hash(entry.path().string());
+        file_list += file_name + "|" + file_hash + "\n";  // Send name|hash to client
     }
 
     if (!has_files) {
@@ -99,6 +100,7 @@ std::string handle_list() {
 
 class ServerConnection {
 public:
+    // Constructor
     ServerConnection(int port) {
         if (!fs::exists(client_log_dir)) {
             std::cout << "Directory " << client_log_dir << " does not exist. Creating..." << std::endl;
@@ -118,6 +120,7 @@ public:
         }
     }
 
+    // Start listening 
     void startListening(int max_clients) {
         if (listen(server_fd, max_clients) < 0) {
             throw std::runtime_error("Listen failed");
@@ -125,6 +128,7 @@ public:
         std::cout << "Server listening on port " << PORT << std::endl;
     }
 
+    // Accepting client connection
     int acceptConnection() {
         int addrlen = sizeof(address);
         int new_socket = accept(server_fd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
@@ -144,6 +148,7 @@ private:
     struct sockaddr_in address;
 };
 
+// Handle client commands
 void* handle_client(void* client_socket_ptr);
 
 int main() {
