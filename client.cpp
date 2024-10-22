@@ -194,32 +194,13 @@ public:
                 missing_in_server.push_back(client_file.first);  // File is missing in server
             }
         }
-
-        if (missing_in_client.empty() && missing_in_server.empty()) {
-            std::cout << "Client and Server are up to date!" << std::endl;
-        }
-        else if (missing_in_client.empty()) {
+        
+        if (missing_in_client.empty()) {
             std::cout << "Client is up to date" << std::endl;
-
-            std::cout << "Files missing in server:" << std::endl;
-            for (const auto &file : missing_in_server) {
-                std::cout << file << std::endl;
-            }
-        }
-        else if (missing_in_server.empty()) {
-            std::cout << "Server is up to date!" << std::endl;
-            std::cout << "Files missing in client:" << std::endl;
-            for (const auto &file : missing_in_client) {
-                std::cout << file << std::endl;
-            }
         }
         else {
             std::cout << "Files missing in client:" << std::endl;
             for (const auto &file : missing_in_client) {
-                std::cout << file << std::endl;
-            }
-            std::cout << "Files missing in server:" << std::endl;
-            for (const auto &file : missing_in_server) {
                 std::cout << file << std::endl;
             }
         }
